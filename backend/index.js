@@ -46,6 +46,24 @@ app.use(express.static(frontendPath));
 app.post("/api/upload", upload.single("file"), uploadDocument);
 app.post("/api/chat", queryDocument);
 
+app.use((err, req, res, next) => {
+  console.error("Unhandled server error:", err?.stack || err);
+
+  if (err?.name === "MulterError") {
+    return res.status(400).json({
+      success: false,
+      error: "File upload failed.",
+      details: err.message,
+    });
+  }
+
+  res.status(500).json({
+    success: false,
+    error: "Internal server error.",
+    details: err?.message || "Unknown error",
+  });
+});
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });

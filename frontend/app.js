@@ -62,7 +62,13 @@ fileInput.addEventListener("change", async (e) => {
       body: formData,
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (parseError) {
+      throw new Error(`Upload failed: ${res.status} ${text || res.statusText}`);
+    }
 
     if (!res.ok || !data.success) {
       throw new Error(data.error || data.details || "Upload failed");
@@ -268,7 +274,13 @@ chatForm.addEventListener("submit", async (e) => {
       body: JSON.stringify({ query, collectionName: nb.collectionName }),
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (parseError) {
+      throw new Error(`Chat failed: ${res.status} ${text || res.statusText}`);
+    }
     removeThinkingDots();
 
     if (res.status === 429) {
