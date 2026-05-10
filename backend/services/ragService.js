@@ -23,6 +23,15 @@ const getVectorStore = async (embeddings, collectionName) => {
 };
 
 export const processAndStoreDocument = async (filePath, mimeType, collectionName) => {
+  // Check file size first
+  const fs = await import("fs/promises");
+  const stats = await fs.stat(filePath);
+  const fileSizeMB = stats.size / (1024 * 1024);
+
+  if (fileSizeMB > 10) { // 10MB limit for Render
+    throw new Error(`File too large (${fileSizeMB.toFixed(1)}MB). Maximum allowed: 10MB.`);
+  }
+
   let loader;
 
   if (mimeType === "application/pdf") {
@@ -30,10 +39,9 @@ export const processAndStoreDocument = async (filePath, mimeType, collectionName
   } else if (mimeType === "text/csv") {
     loader = new CSVLoader(filePath);
   } else if (mimeType === "text/plain") {
-  
+
     loader = {
       load: async () => {
-        const fs = await import("fs/promises");
         const text = await fs.readFile(filePath, "utf8");
         return [{ pageContent: text, metadata: { source: filePath } }];
       }
@@ -45,34 +53,40 @@ export const processAndStoreDocument = async (filePath, mimeType, collectionName
   const rawDocs = await loader.load();
   console.log(`Loaded ${rawDocs.length} pages/rows.`);
 
-
+  // Optimize for memory: smaller chunks, less overlap
   const textSplitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 1000,
-    chunkOverlap: 200,
+    chunkSize: 500,  // Reduced from 1000
+    chunkOverlap: 50, // Reduced from 200
   });
 
   const chunks = await textSplitter.splitDocuments(rawDocs);
   console.log(`Split into ${chunks.length} chunks.`);
 
+  if (chunks.length > 2000) { // Limit total chunks
+    throw new Error(`Document too large (${chunks.length} chunks). Maximum allowed: 2000 chunks.`);
+  }
 
   const embeddings = getEmbeddings();
-  const batchSize = 500;
+  const batchSize = 100; // Reduced from 500 for memory
   let vectorStore;
 
   for (let i = 0; i < chunks.length; i += batchSize) {
     const batch = chunks.slice(i, i + batchSize);
     console.log(`Embedding & Indexing chunks ${i + 1} to ${Math.min(i + batchSize, chunks.length)} out of ${chunks.length}...`);
-    
-    if (!vectorStore) {
 
+    if (!vectorStore) {
       vectorStore = await QdrantVectorStore.fromDocuments(batch, embeddings, {
         url: process.env.QDRANT_URL || "http://localhost:6333",
         apiKey: process.env.QDRANT_API_KEY,
         collectionName: collectionName || process.env.COLLECTION_NAME || "notebooklm_rag",
       });
     } else {
-
       await vectorStore.addDocuments(batch);
+    }
+
+    // Force garbage collection if available
+    if (global.gc) {
+      global.gc();
     }
   }
 

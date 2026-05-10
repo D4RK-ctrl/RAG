@@ -42,6 +42,16 @@ uploadBtn.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
+  // Check file size (10MB limit)
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  if (file.size > maxSize) {
+    showStatus(`✗ File too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum: 10MB.`, "error");
+    fileInput.value = "";
+    setTimeout(() => hideStatus(), 5000);
+    return;
+  }
+
   fileInput.value = ""; 
 
   uploadBtn.disabled = true;
