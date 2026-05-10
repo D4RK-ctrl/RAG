@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FilePilot — Document Navigator</title>
+  <link rel="icon" type="image/x-icon" href="./mats/japan.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="dark-theme">
+  <div id="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l5 20-5-3-5 3 5-20z"></path>
+              <path d="M12 8l3 3-3 3-3-3 3-3z"></path>
+            </svg>
+          </div>
+          <div class="brand-copy">
+            <h1>FilePilot</h1>
+            <p>Document navigator</p>
+          </div>
+        </div>
+        <button id="theme-toggle" class="icon-btn" title="Switch theme">
+          <svg id="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <svg id="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+      </div>
+
+      <div class="upload-panel">
+        <input type="file" id="file-input" accept=".pdf,.csv,.txt" hidden />
+        <button id="upload-btn" class="action-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"></path><path d="M8 11l4-4 4 4"></path><path d="M4 19h16"></path></svg>
+          Load File
+        </button>
+        <div id="upload-status" class="status-text hidden">Preparing upload...</div>
+      </div>
+
+      <div class="files-header">
+        <div class="files-title">
+          <h3>File Library</h3>
+          <span>Tap any document to begin</span>
+        </div>
+      </div>
+
+      <ul id="file-list" class="file-list">
+        <div class="empty-state">Library empty — add a document to begin.</div>
+      </ul>
+    </aside>
+
+    <main class="workspace">
+      <header class="workspace-header">
+        <div>
+          <p class="workspace-label">Active file</p>
+          <h2 id="active-file-name">No file selected</h2>
+        </div>
+        <div class="workspace-meta">
+          <p>Ask questions, summarize reports, or search your documents instantly.</p>
+        </div>
+      </header>
+
+      <section id="chat-messages" class="workspace-body">
+        <div class="welcome-screen">
+          <div class="hero-shape"></div>
+          <div class="welcome-copy">
+            <h2>Welcome to FilePilot</h2>
+            <p>Drop in any PDF, CSV, or TXT file and start asking intelligent questions about your content.</p>
+            <div class="quick-list">
+              <span>• Summarize sections</span>
+              <span>• Find facts fast</span>
+              <span>• Analyze documents</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="chat-input-wrapper">
+        <form id="chat-form" class="chat-form">
+          <input type="text" id="chat-input" placeholder="Ask about this file..." disabled autocomplete="off" />
+          <button type="submit" id="send-btn" class="send-btn" disabled>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4 20-7z"></path></svg>
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
